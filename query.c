@@ -9,6 +9,7 @@ QueryAction findAction(const char *query, char **details)
     QueryAction action = INVALID;
     char *word = calloc(ACTION_LENGTH, sizeof(char));
     memcpy(word, query, ACTION_LENGTH);
+	//printf("strcmp() = %d\n", strcmp(NAME_INSERT, word));
     // Check which name fits
     if (strcmp(NAME_SELECT, word) == 0) {
         action = SELECT;
@@ -42,6 +43,9 @@ Data *interpretQuery(const char *query, int *resultsCount)
             // Interpret the rest of the statement in stages
             return interpretSelect(details, resultsCount);
             break;
+		case INSERT:
+			interpretInsert(details);
+			break;
         default:
             printf("The query \"%s\" is malformed.\n", query);
             break;
@@ -66,6 +70,8 @@ Data *interpretSelect(const char *details, int *resultsCount)
             FILE *table = fopen("data.db", "rb");
             fseek(table, 0, SEEK_SET);
             if (table) {
+				// TODO balanced tree for database structure
+				// TODO n-trees
                 while (fread(&entry, sizeof(entry), 1, table)) {
                     entries[entryCount++] = entry;
                     entries = realloc(entries, sizeof(Data) * (entryCount+1));
@@ -76,6 +82,7 @@ Data *interpretSelect(const char *details, int *resultsCount)
         for (i = 0; i < tokensCount; i++) {
             //printf("tokens[%d] = \"%s\"\n", i, tokens[i]);
         }
+		printDataResult(entries, entryCount);
     } else {
         free(entries);
         entries = NULL;
@@ -83,6 +90,37 @@ Data *interpretSelect(const char *details, int *resultsCount)
     }
     *resultsCount = entryCount;
     return entries;
+}
+void interpretInsert(const char *details)
+{
+	// Local store
+	char **tokens = NULL;
+	int tokensCount = 0;
+	printf("Here [%s] strlen(%d)\n", details, strlen(details));
+	tokenizer(details, &tokens, &tokensCount, " ");
+	// Field values
+	Data entry = {0, 0, 0, '\0'};
+	printf("tokensCount: %d\n", tokensCount);
+	switch (tokensCount) {
+		case 1:
+			entry.bus = atoi(tokens[0]);
+		case 2:
+			entry.time = atoi(tokens[1]);
+		case 3:
+			entry.route = atoi(tokens[2]);
+		case 4:
+			strcpy(entry.stop, tokens[3]);
+			break;
+		default:
+			printf("No entries provided for insert\n");
+	}
+	if (tokensCount) {
+		FILE *table = fopen("data.db", "ab");
+		if (table) {
+			fwrite(&entry, sizeof(entry), 1, table);
+			fclose(table);
+		}
+	}
 }
 void printDataResult(Data *results, int resultsCount)
 {

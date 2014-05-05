@@ -20,6 +20,7 @@ typedef enum QueryAction {
 QueryAction findAction(const char *query, char **details);
 Data *interpretQuery(const char *query, int *resultsCount);
 Data *interpretSelect(const char *details, int *resultsCount);
+void interpretInsert(const char *details);
 void printDataResult(Data *results, int resultsCount);
 
 #endif /* QUERY_H */

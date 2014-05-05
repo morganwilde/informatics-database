@@ -3,7 +3,6 @@
 #include <string.h>
 #include "query.h"
 #include "schema.h"
-/*
 static const char database[] = "data.db";
 
 void dataAdd(const char *filename, const int bus, const int time, const int route, const char *stop)
@@ -16,21 +15,9 @@ void dataAdd(const char *filename, const int bus, const int time, const int rout
         fclose(file);
     }
 }
-void dataRead(const char *filename)
-{
-    FILE *file = fopen(filename, "rb");
-    if (file) {
-        Data data;
-        while (fread(&data, sizeof(data), 1, file)) {
-            printf("bus=[%d] time=[%d] route=[%d] stop=[%s]\n", data.bus, data.time, data.route, data.stop);
-        }
-        fclose(file);
-    }
-}
-*/
 int main(void)
 {
-    //dataAdd(database, 1, 600, 0, "stotis");
+    dataAdd(database, 2, 600, 0, "baltupiai");
     //dataRead(database);
     int resultsCount = 0;
     Data *results = interpretQuery("SELECT *", &resultsCount);

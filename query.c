@@ -59,8 +59,9 @@ Data *interpretSelect(const char *details, int *resultsCount)
     char **tokens = NULL;
     int tokensCount = 0;
     tokenizer(details, &tokens, &tokensCount, " ");
+	//printf("tokenCount : %d\n", tokensCount);
     if (tokensCount) {
-        if ((tokensCount >= 1) && (strcmp(tokens[0], "*"))) {
+        if ((tokensCount >= 1) && (strcmp(tokens[0], "*") == 0)) {
             // Read everything from the database table
             FILE *table = fopen("data.db", "rb");
             fseek(table, 0, SEEK_SET);
@@ -85,8 +86,56 @@ Data *interpretSelect(const char *details, int *resultsCount)
 }
 void printDataResult(Data *results, int resultsCount)
 {
-    int i;
+	// Table print formating
+	int lengths[] = {5, 10, 7, 20};
+	int columnCount = sizeof(lengths)/sizeof(int);
+	char *names[] = {"bus", "time", "route", "stop"};
+	char temp[128] = {'\0'};
+	char title[128] = {'\0'};
+	char vertical[128] = {'\0'};
+
+	int i;
+	for (i = 0; i < columnCount; i++) {
+		sprintf(temp, "%*s | ", lengths[i], names[i]);
+		if (strlen(title)) {
+			strcat(title, temp);
+		} else {
+			sprintf(title, "%s", temp);
+		}
+	}
+	static const char separator[] = "-";
+	for (i = 0; i < columnCount; i++) {
+		sprintf(temp, "%s", separator);
+		int j;
+		for (j = 0; j < lengths[i]+1; j++) {
+			strcat(temp, separator);
+			if ((i == 0) && ((j+1) == lengths[i])) {
+				break;
+			}
+		}
+		strcat(temp, "+");
+		if (strlen(vertical)) {
+			strcat(vertical, temp);
+		} else {
+			sprintf(vertical, "%s", temp);
+		}
+	}
+	printf("%s\n%s\n", title, vertical);
+	
+	// Actual data printing
+	char 	field1[128] = {'\0'},
+			field2[128] = {'\0'},
+			field3[128] = {'\0'},
+			field4[128] = {'\0'};
     for (i = 0; i < resultsCount; i++) {
-        printf("result:\n");
+		sprintf(field1, "%d", results[i].bus);
+		sprintf(field2, "%d", results[i].time);
+		sprintf(field3, "%d", results[i].route);
+		sprintf(field4, "%s", results[i].stop);
+        printf("%*s | %*s | %*s | %*s\n",
+				lengths[0], field1,
+				lengths[1], field2,
+				lengths[2], field3,
+				lengths[3], field4);
     }
 }

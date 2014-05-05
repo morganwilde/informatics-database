@@ -29,7 +29,7 @@ void tokenizer(const char *input, char ***output, int *outputCount, const char *
 
     // Start reading
     char c;
-    char *token = NULL;
+    char *token = (char *)malloc(sizeof(char) * 1);
     int tokenLength = 0;
             
     // Read tokens from input
@@ -39,13 +39,14 @@ void tokenizer(const char *input, char ***output, int *outputCount, const char *
         //printf("c = %c\n", c);
         if (isDelimeter(delimeters, strlen(delimeters), c) || ((i+1) == strlen(input))) {
             // Delimeter
+			if (!isDelimeter(delimeters, strlen(delimeters), c) && ((i+1) == strlen(input))) {
+				// Append the last character
+				tokenLength++;
+				token[tokenLength-1] = c;
+			}
+			//printf("tokenLength : %d\n", tokenLength);
             if (tokenLength) {
                 // Add terminating string char
-                if (!isDelimeter(delimeters, strlen(delimeters), c) && ((i+1) == strlen(input))) {
-                    // Append the last character
-                    tokenLength++;
-                    token[tokenLength-1] = c;
-                }
                 token = realloc(token, sizeof(char *) * (tokenLength+1));
                 token[tokenLength] = '\0';
                 // Proceed
@@ -60,7 +61,7 @@ void tokenizer(const char *input, char ***output, int *outputCount, const char *
             // Token
             tokenLength++;
             if (token == NULL) {
-                token = (char *)malloc(sizeof(char) * tokenLength);
+                token;// = (char *)malloc(sizeof(char) * tokenLength);
             } else {
                 token = (char *)realloc(token, sizeof(char) * tokenLength);
             }
